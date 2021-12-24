@@ -10,7 +10,7 @@ public class Courier extends RestAssuredParameters {
         return "Courier{}";
     }
 
-    public static final String COURIER_URL = "/api/v1/courier/";
+    public static final String COURIER_URL = "/courier/";
 
     @Step("Sending POST request to" + COURIER_URL)
     public Response createCourier(VariablesCreate variablesCreate) {

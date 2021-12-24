@@ -12,7 +12,7 @@ public class RestAssuredParameters {
     public RequestSpecification getBaseParameters() {
         return new RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
-                .setBaseUri("http://qa-scooter.praktikum-services.ru")
+                .setBaseUri("http://qa-scooter.praktikum-services.ru/api/v1")
                 .build();
     }
 }

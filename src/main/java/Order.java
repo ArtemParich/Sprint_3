@@ -10,9 +10,9 @@ public class Order extends RestAssuredParameters{
         return "Order{}";
     }
 
-    public static final String URL_ORDER = "/api/v1/orders";
-    public static final String URL_ORDER_TRACK = "/api/v1/orders/track";
-    public static final String URL_ORDER_ACCEPT = "/api/v1/orders/accept/";
+    public static final String URL_ORDER = "/orders";
+    public static final String URL_ORDER_TRACK = "/orders/track";
+    public static final String URL_ORDER_ACCEPT = "/orders/accept/";
 
     @Step("Sending POST request to " + URL_ORDER)
     public Response createOrder(VariablesOrder variablesOrder) {
