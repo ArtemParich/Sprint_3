@@ -1,6 +1,8 @@
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 
 public class OrderClient extends RestAssuredParameters{
@@ -78,7 +80,7 @@ public class OrderClient extends RestAssuredParameters{
     }
 
     @Step ("Getting order track")
-    public int getOrderTrack(OrderClient orderClient) {
-        return orderClient.createOrder(Order.getVariablesOrder()).then().extract().body().path("track");
+    public int getOrderTrack(OrderClient orderClient, List<String> color) {
+        return orderClient.createOrder(Order.getVariablesParamOrder(color)).then().extract().body().path("track");
     }
 }

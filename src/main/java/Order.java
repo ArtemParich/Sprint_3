@@ -60,26 +60,4 @@ public class Order {
         String comment = RandomStringUtils.randomAlphabetic(20); // комментарий
         return new Order(firstName, lastName, address, metroStation, phone, renTime, deliveryDate, comment, color);
     }
-
-    public static Order getVariablesOrder() {
-        // динамические переменные для теста
-        String firstName = RandomStringUtils.randomAlphabetic(10); //имя
-        String lastName = RandomStringUtils.randomAlphabetic(10); // фамилия
-        String address = RandomStringUtils.randomAlphabetic(15); // адрес
-        String metroStation = valueOf(ThreadLocalRandom.current().nextInt(1,225)); // станция метро (рандомный выбор станции из 224 имеющихся)
-        String phone = RandomStringUtils.randomNumeric(12); // номер телефона
-        int renTime = ThreadLocalRandom.current().nextInt(1,7); // время аренды (1-6 дней)
-        Calendar calendar = new GregorianCalendar();
-        calendar.add(Calendar.DAY_OF_MONTH, +ThreadLocalRandom.current().nextInt(1,8));
-        String deliveryDate = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()); // дата доставки: прибавляем от 1 до 7 дней от даты создания заказа
-        String comment = RandomStringUtils.randomAlphabetic(20); // комментарий
-        final List<String> twoColors = List.of("BLACK", "GREY"); //  рандомный выбор цвета из списка вариантов
-        final List<String> blackColors = List.of("BLACK");
-        final List<String> greyColors = List.of("GREY");
-        final List<String> nullColors = List.of("");
-        final List<List<String>> allColors = List.of(twoColors, blackColors, greyColors, nullColors);
-        Random random = new Random();
-        List<String> color = allColors.get(random.nextInt(allColors.size()));
-        return new Order(firstName, lastName, address, metroStation, phone, renTime, deliveryDate, comment, color);
-    }
 }

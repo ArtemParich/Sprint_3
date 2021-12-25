@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static junit.framework.TestCase.*;
 import static org.apache.http.HttpStatus.*;
 
@@ -27,7 +29,8 @@ public class GetOrderClientByNumberTest {
     @Test
     @DisplayName("Checking getting order by number")
     public void canGetOrderByNumberTest() {
-        int orderTrack = orderClient.getOrderTrack(orderClient);
+        List<String> color = List.of("GREY");
+        int orderTrack = orderClient.getOrderTrack(orderClient, color);
         Response responseGetOrderByNumber = orderClient.getOrderByNumber(orderTrack);
 
         int expectedCode = SC_OK;

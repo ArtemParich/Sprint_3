@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.*;
@@ -17,6 +19,7 @@ public class AcceptOderTest {
     public OrderClient orderClient;
     int orderTrack;
     int orderId;
+    private final List<String> color = List.of("BLACK");
 
     @Before
     public void start() {
@@ -25,7 +28,7 @@ public class AcceptOderTest {
         courierClient.createCourier(courier);
         courierId = courierClient.getCourierId(courierClient, courier);
         orderClient = new OrderClient();
-        orderTrack = orderClient.getOrderTrack(orderClient);
+        orderTrack = orderClient.getOrderTrack(orderClient, color);
         orderId = orderClient.getOrderId(orderTrack);
     }
 
