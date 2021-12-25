@@ -7,24 +7,24 @@ import org.junit.Test;
 import static junit.framework.TestCase.*;
 import static org.apache.http.HttpStatus.*;
 
-public class LoginCourierTest {
+public class LoginCourierClientTest {
 
+    public CourierClient courierClient;
     public Courier courier;
-    public VariablesCreate variablesCreate;
     private int courierId;
 
     @Before
     public void start() {
-        courier = new Courier();
-        variablesCreate = VariablesCreate.getVariablesCreate();
-        courier.createCourier(variablesCreate);
-        courierId = courier.getCourierId(courier, variablesCreate);
+        courierClient = new CourierClient();
+        courier = Courier.getAllVariables();
+        courierClient.createCourier(courier);
+        courierId = courierClient.getCourierId(courierClient, courier);
     }
 
     @Test
     @DisplayName("Checking login courier")
     public void canLoginCourierTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLogin(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLogin(courier));
 
         int expectedCode = SC_OK;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
@@ -34,7 +34,7 @@ public class LoginCourierTest {
     @Test
     @DisplayName("Checking login courier without login")
     public void cannotLoginCourierWithoutLoginTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLoginWithoutLog(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginWithoutLog(courier));
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для входа";
@@ -46,7 +46,7 @@ public class LoginCourierTest {
     @Test
     @DisplayName("Checking login courier without password")
     public void cannotLoginCourierWithoutPasswordTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLoginWithoutPas(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginWithoutPas(courier));
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для входа";
@@ -58,7 +58,7 @@ public class LoginCourierTest {
     @Test
     @DisplayName("Checking login courier with incorrect login")
     public void cannotLoginCourierIncorrectLoginTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLoginIncorrectLog(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectLog(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";
@@ -70,7 +70,7 @@ public class LoginCourierTest {
     @Test
     @DisplayName("Checking login courier with incorrect password")
     public void cannotLoginCourierIncorrectPasswordTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLoginIncorrectPas(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectPas(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";
@@ -82,7 +82,7 @@ public class LoginCourierTest {
     @Test
     @DisplayName("Checking login courier with incorrect user")
     public void cannotLoginCourierIncorrectLoginAndPasswordTest() {
-        Response responseLoginCourier = courier.loginCourier(VariablesLogin.getVariableLoginIncorrectLogAndPas(variablesCreate));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectLogAndPas(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";
@@ -94,7 +94,7 @@ public class LoginCourierTest {
     @After
     public void finish() {
         if (courierId != 0) {
-            courier.deleteCourier(courierId);
+            courierClient.deleteCourier(courierId);
         }
     }
 }

@@ -8,23 +8,23 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.*;
 
-public class DeleteCourierTest {
+public class DeleteCourierClientTest {
 
-    public Courier courier;
+    public CourierClient courierClient;
 
     @Before
     public void start() {
-        courier = new Courier();
+        courierClient = new CourierClient();
     }
 
     @Test
     @DisplayName("Checking delete courier")
     public void canDeleteCourierTest() {
-        courier = new Courier();
-        VariablesCreate variablesCreate = VariablesCreate.getVariablesCreate();
-        courier.createCourier(variablesCreate);
-        int courierId = courier.getCourierId(courier, variablesCreate);
-        Response responseDeleteCourier = courier.deleteCourier(courierId);
+        courierClient = new CourierClient();
+        Courier courier = Courier.getAllVariables();
+        courierClient.createCourier(courier);
+        int courierId = courierClient.getCourierId(courierClient, courier);
+        Response responseDeleteCourier = courierClient.deleteCourier(courierId);
 
         int expectedCode = SC_OK;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseDeleteCourier.statusCode());
@@ -34,8 +34,8 @@ public class DeleteCourierTest {
     @Test
     @DisplayName("Checking delete courier without courier id")
     public void cannotDeleteCourierWithoutIdTest() {
-        courier = new Courier();
-        Response responseDeleteCourierWithoutId = courier.deleteCourierWithoutId();
+        courierClient = new CourierClient();
+        Response responseDeleteCourierWithoutId = courierClient.deleteCourierWithoutId();
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для удаления курьера";
@@ -48,7 +48,7 @@ public class DeleteCourierTest {
     @DisplayName("Checking delete courier with nonexistent courier id")
     public void cannotDeleteCourierWithNonexistentIdTest() {
         int courierId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
-        Response responseDeleteCourierWithoutId = courier.deleteCourier(courierId);
+        Response responseDeleteCourierWithoutId = courierClient.deleteCourier(courierId);
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Курьера с таким id нет";

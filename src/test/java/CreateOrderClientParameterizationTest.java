@@ -11,11 +11,11 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.apache.http.HttpStatus.SC_CREATED;
 
     @RunWith(Parameterized.class)
-    public class CreateOrderParameterizationTest {
+    public class CreateOrderClientParameterizationTest {
 
         public final List<String> color;
 
-        public CreateOrderParameterizationTest(List<String> color) {
+        public CreateOrderClientParameterizationTest(List<String> color) {
             this.color = color;
         }
 
@@ -33,8 +33,8 @@ import static org.apache.http.HttpStatus.SC_CREATED;
         @Test
         @DisplayName("Check create order with different colors / parameterized test")
         public void canCreateOrderWithDifferentColorsParameterizedTest() {
-            Order order = new Order();
-            Response responseCreateOrder = order.createOrder(VariablesOrder.getVariablesParamOrder(color));
+            OrderClient orderClient = new OrderClient();
+            Response responseCreateOrder = orderClient.createOrder(Order.getVariablesParamOrder(color));
 
             int expectedCode = SC_CREATED;
             assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateOrder.statusCode());

@@ -8,38 +8,38 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.*;
 
-public class CreateCourierTest {
+public class CreateCourierClientTest {
 
-    public Courier courier;
+    public CourierClient courierClient;
     private int courierId;
 
     @Before
     public void start() {
-        courier = new Courier();
+        courierClient = new CourierClient();
         courierId = 0;
     }
 
     @Test
     @DisplayName("Checking create courier")
     public void canCreateCourierTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getVariablesCreate();
+        Courier courier = Courier.getAllVariables();
 
-        Response responseCreateCourier = courier.createCourier(variablesCreate);
+        Response responseCreateCourier = courierClient.createCourier(courier);
 
         int expectedCode = SC_CREATED;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertTrue("The response body should be: true", responseCreateCourier.then().extract().body().path("ok"));
 
-        courierId = courier.getCourierId(courier, variablesCreate);
+        courierId = courierClient.getCourierId(courierClient, courier);
     }
 
     @Test
     @DisplayName("Checking create two identical couriers")
     public void cannotCreateTwoIdenticalCouriersTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getVariablesCreate();
+        Courier courier = Courier.getAllVariables();
 
-        courier.createCourier(variablesCreate);
-        Response responseCreateCourier = courier.createCourier(variablesCreate);
+        courierClient.createCourier(courier);
+        Response responseCreateCourier = courierClient.createCourier(courier);
 
         int expectedCode = SC_CONFLICT;
         String expectedMessage = "Этот логин уже используется";
@@ -47,15 +47,15 @@ public class CreateCourierTest {
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
                 responseCreateCourier.then().extract().body().path("message"));
 
-        courierId = courier.getCourierId(courier, variablesCreate);
+        courierId = courierClient.getCourierId(courierClient, courier);
     }
 
     @Test
     @DisplayName("Checking create courier without login")
     public void cannotCreateCourierWithoutLoginTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getPasAndName();
+        Courier courier = Courier.getPasswordAndName();
 
-        Response responseCreateCourier = courier.createCourier(variablesCreate);
+        Response responseCreateCourier = courierClient.createCourier(courier);
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для создания учетной записи";
@@ -67,9 +67,9 @@ public class CreateCourierTest {
     @Test
     @DisplayName("Checking create courier without password")
     public void cannotCreateCourierWithoutPasswordTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getLogAndName();
+        Courier courier = Courier.getLoginAndName();
 
-        Response responseCreateCourier = courier.createCourier(variablesCreate);
+        Response responseCreateCourier = courierClient.createCourier(courier);
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для создания учетной записи";
@@ -81,9 +81,9 @@ public class CreateCourierTest {
     @Test
     @DisplayName("Checking create courier without first name")
     public void cannotCreateCourierWithoutFirstNameTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getLogAndPas();
+        Courier courier = Courier.getLoginAndPassword();
 
-        Response responseCreateCourier = courier.createCourier(variablesCreate);
+        Response responseCreateCourier = courierClient.createCourier(courier);
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для создания учетной записи";
@@ -95,10 +95,10 @@ public class CreateCourierTest {
     @Test
     @DisplayName("Checking create courier with busy login")
     public void cannotCreateCourierWithBusyLoginTest() {
-        VariablesCreate variablesCreate = VariablesCreate.getVariablesCreate();
+        Courier courier = Courier.getAllVariables();
 
-        courier.createCourier(variablesCreate);
-        Response responseCreateCourier = courier.createCourier(VariablesCreate.getNewPasAndName(variablesCreate.login));
+        courierClient.createCourier(courier);
+        Response responseCreateCourier = courierClient.createCourier(Courier.getNewPasswordAndName(courier.login));
 
         int expectedCode = SC_CONFLICT;
         String expectedMessage = "Этот логин уже используется";
@@ -106,13 +106,13 @@ public class CreateCourierTest {
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
                 responseCreateCourier.then().extract().body().path("message"));
 
-        courierId = courier.getCourierId(courier, variablesCreate);
+        courierId = courierClient.getCourierId(courierClient, courier);
     }
 
     @After
     public void finish() {
         if (courierId != 0) {
-            courier.deleteCourier(courierId);
+            courierClient.deleteCourier(courierId);
          }
     }
 }

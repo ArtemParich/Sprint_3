@@ -1,53 +1,59 @@
 import io.qameta.allure.Step;
-import io.restassured.response.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 
-import static io.restassured.RestAssured.given;
-
-public class Courier extends RestAssuredParameters {
+public class Courier {
+    public String login;
+    public String password;
+    public String firstName;
 
     @Override
     public String toString() {
-        return "Courier{}";
+        return "VariablesCreate{" +
+                "login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                '}';
     }
 
-    public static final String COURIER_URL = "/courier/";
-
-    @Step("Sending POST request to" + COURIER_URL)
-    public Response createCourier(VariablesCreate variablesCreate) {
-
-        return given()
-                .spec(getBaseParameters())
-                .body(variablesCreate)
-                .post(COURIER_URL);
+    public Courier(String login, String password, String firstName) {
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
     }
 
-    @Step ("Sending POST request to " + COURIER_URL)
-    public Response loginCourier(VariablesLogin variablesLogin) {
-
-        return given()
-                .spec(getBaseParameters())
-                .body(variablesLogin)
-                .post(COURIER_URL + "login");
+    @Step("Getting all variables for creating a courier")
+    public static Courier getAllVariables() {
+        final String login = RandomStringUtils.randomAlphabetic(10);
+        final String password = RandomStringUtils.randomAlphabetic(10);
+        final String firstName = RandomStringUtils.randomAlphabetic(10);
+        return new Courier(login, password, firstName);
     }
 
-    @Step ("Sending DELETE request to " + COURIER_URL)
-    public Response deleteCourier(int courierId) {
-
-        return given()
-                .spec(getBaseParameters())
-                .delete(COURIER_URL + courierId);
+    @Step("Getting password and first name for creating a courier")
+    public static Courier getPasswordAndName() {
+        final String password = RandomStringUtils.randomAlphabetic(10);
+        final String firstName = RandomStringUtils.randomAlphabetic(10);
+        return new Courier(null, password, firstName);
     }
 
-    @Step ("Sending DELETE request to " + COURIER_URL + " without courier id")
-    public Response deleteCourierWithoutId() {
-
-        return given()
-                .spec(getBaseParameters())
-                .delete(COURIER_URL);
+    @Step("Getting login and first name for creating a courier")
+    public static Courier getLoginAndName() {
+        final String login = RandomStringUtils.randomAlphabetic(10);
+        final String firstName = RandomStringUtils.randomAlphabetic(10);
+        return new Courier(login, null, firstName);
     }
 
-    @Step ("Getting courier id")
-    public int getCourierId(Courier courier, VariablesCreate variablesCreate) {
-        return courier.loginCourier(VariablesLogin.getVariableLogin(variablesCreate)).then().extract().body().path("id");
+    @Step("Getting login and password for creating a courier")
+    public static Courier getLoginAndPassword() {
+        final String login = RandomStringUtils.randomAlphabetic(10);
+        final String password = RandomStringUtils.randomAlphabetic(10);
+        return new Courier(login, password, null);
+    }
+
+    @Step("Getting new password and first name for creating a courier")
+    public static Courier getNewPasswordAndName(String login) {
+        final String password = RandomStringUtils.randomAlphabetic(10);
+        final String firstName = RandomStringUtils.randomAlphabetic(10);
+        return new Courier(login, password, firstName);
     }
 }

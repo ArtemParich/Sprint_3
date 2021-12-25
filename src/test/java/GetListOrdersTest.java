@@ -11,8 +11,8 @@ public class GetListOrdersTest {
     @Test
     @DisplayName("Checking getting orders list")
     public void canGetOrdersListTest() {
-        Order order = new Order();
-        Response responseCreateOrder = order.getOrderList();
+        OrderClient orderClient = new OrderClient();
+        Response responseCreateOrder = orderClient.getOrderList();
 
         int expectedCode = SC_OK;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateOrder.statusCode());

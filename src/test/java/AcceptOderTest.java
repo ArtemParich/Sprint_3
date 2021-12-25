@@ -11,28 +11,28 @@ import static org.apache.http.HttpStatus.*;
 
 public class AcceptOderTest {
 
+    public CourierClient courierClient;
     public Courier courier;
-    public VariablesCreate variablesCreate;
     private int courierId;
-    public Order order;
+    public OrderClient orderClient;
     int orderTrack;
     int orderId;
 
     @Before
     public void start() {
-        courier = new Courier();
-        variablesCreate = VariablesCreate.getVariablesCreate();
-        courier.createCourier(variablesCreate);
-        courierId = courier.getCourierId(courier, variablesCreate);
-        order = new Order();
-        orderTrack = order.getOrderTrack(order);
-        orderId = order.getOrderId(orderTrack);
+        courierClient = new CourierClient();
+        courier = Courier.getAllVariables();
+        courierClient.createCourier(courier);
+        courierId = courierClient.getCourierId(courierClient, courier);
+        orderClient = new OrderClient();
+        orderTrack = orderClient.getOrderTrack(orderClient);
+        orderId = orderClient.getOrderId(orderTrack);
     }
 
     @Test
     @DisplayName("Checking accept order")
     public void canAcceptOrderTest() {
-        Response responseAcceptOrder = order.acceptOrder(courierId, orderId);
+        Response responseAcceptOrder = orderClient.acceptOrder(courierId, orderId);
 
         int expectedCode = SC_OK;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
@@ -42,7 +42,7 @@ public class AcceptOderTest {
     @Test
     @DisplayName("Checking accept order without courier id")
     public void cannotAcceptOrderWithoutCourierIdTest() {
-        Response responseAcceptOrder = order.acceptOrderWithoutCourierId(orderId);
+        Response responseAcceptOrder = orderClient.acceptOrderWithoutCourierId(orderId);
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для поиска";
@@ -54,7 +54,7 @@ public class AcceptOderTest {
     @Test
     @DisplayName("Checking accept order without order id")
     public void cannotAcceptOrderWithoutOrderIdTest() {
-        Response responseAcceptOrder = order.acceptOrderWithoutOrderId(courierId);
+        Response responseAcceptOrder = orderClient.acceptOrderWithoutOrderId(courierId);
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для поиска";
@@ -67,9 +67,9 @@ public class AcceptOderTest {
     @DisplayName("Checking accept order with nonexistent courier id")
     public void cannotAcceptOrderWithNonexistentCourierIdTest() {
         int randomCourierId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
-        int orderId = order.getOrderId(orderTrack);
+        int orderId = orderClient.getOrderId(orderTrack);
 
-        Response responseAcceptOrder = order.acceptOrder(randomCourierId, orderId);
+        Response responseAcceptOrder = orderClient.acceptOrder(randomCourierId, orderId);
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Курьера с таким id не существует";
@@ -83,7 +83,7 @@ public class AcceptOderTest {
     public void cannotAcceptOrderWithNonexistentOrderIdTest() {
         int randomOrderId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
 
-        Response responseAcceptOrder = order.acceptOrder(courierId, randomOrderId);
+        Response responseAcceptOrder = orderClient.acceptOrder(courierId, randomOrderId);
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Заказа с таким id не существует";
@@ -94,6 +94,6 @@ public class AcceptOderTest {
 
     @After
     public void finish() {
-        courier.deleteCourier(courierId);
+        courierClient.deleteCourier(courierId);
      }
 }
