@@ -1,4 +1,3 @@
-import io.qameta.allure.Step;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public class CourierCredentials {
@@ -18,34 +17,28 @@ public class CourierCredentials {
         this.password = password;
     }
 
-    @Step("Getting login and password for login a courier")
     public static CourierCredentials getVariablesForAuthorization(Courier courier) {
         return new CourierCredentials(courier.login, courier.password);
     }
 
-    @Step("Getting password for login a courier")
     public static CourierCredentials getPasswordWithoutLogin(Courier courier) {
         return new CourierCredentials(null, courier.password);
     }
 
-    @Step("Getting login for login a courier")
     public static CourierCredentials getLoginWithoutPassword(Courier courier) {
         return new CourierCredentials(courier.login, null);
     }
 
-    @Step("Getting password and incorrect login for login a courier")
     public static CourierCredentials getPasswordAndIncorrectLogin(Courier courier) {
         courier.login = RandomStringUtils.randomAlphabetic(10);
         return new CourierCredentials(courier.login, courier.password);
     }
 
-    @Step("Getting login and incorrect password for login a courier")
     public static CourierCredentials getLoginAndIncorrectPassword(Courier courier) {
         courier.password = RandomStringUtils.randomAlphabetic(10);
         return new CourierCredentials(courier.login, courier.password);
     }
 
-    @Step("Getting incorrect login and incorrect password for login a courier")
     public static CourierCredentials getIncorrectLoginAndPassword(Courier courier) {
         courier.login = RandomStringUtils.randomAlphabetic(10);
         courier.password = RandomStringUtils.randomAlphabetic(10);

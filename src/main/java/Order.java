@@ -1,4 +1,3 @@
-import io.qameta.allure.Step;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +46,6 @@ public class Order {
         this.color = color;
     }
 
-    @Step("Getting all variables for creating a order / parameterized test")
     public static Order getVariablesParamOrder(List<String> color) {
         // динамические переменные для теста
         String firstName = RandomStringUtils.randomAlphabetic(10); //имя
@@ -63,7 +61,6 @@ public class Order {
         return new Order(firstName, lastName, address, metroStation, phone, renTime, deliveryDate, comment, color);
     }
 
-    @Step("Getting all variables for creating a order")
     public static Order getVariablesOrder() {
         // динамические переменные для теста
         String firstName = RandomStringUtils.randomAlphabetic(10); //имя
