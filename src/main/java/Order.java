@@ -9,7 +9,7 @@ import static java.lang.String.valueOf;
 public class Order {
     @Override
     public String toString() {
-        return "VariablesOrder{" +
+        return "Order{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", address='" + address + '\'' +

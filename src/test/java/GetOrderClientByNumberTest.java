@@ -1,5 +1,5 @@
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,9 @@ public class GetOrderClientByNumberTest {
         courierClient = new CourierClient();
         courier = Courier.getAllVariables();
         courierClient.createCourier(courier);
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
         orderClient = new OrderClient();
     }
 
@@ -30,36 +32,33 @@ public class GetOrderClientByNumberTest {
     @DisplayName("Checking getting order by number")
     public void canGetOrderByNumberTest() {
         List<String> color = List.of("GREY");
-        int orderTrack = orderClient.getOrderTrack(orderClient, color);
-        Response responseGetOrderByNumber = orderClient.getOrderByNumber(orderTrack);
+        int orderTrack = orderClient.createOrder(Order.getVariablesParamOrder(color))
+                .then().statusCode(SC_CREATED)
+                .extract().body().path("track");
 
-        int expectedCode = SC_OK;
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseGetOrderByNumber.statusCode());
-        assertNotNull("The response body should be: body order", responseGetOrderByNumber.then().extract().body().path("order"));
+        ValidatableResponse responseGetOrderByNumber = orderClient.getOrderByNumber(orderTrack)
+                .then().statusCode(SC_OK);
+        assertNotNull("The response body should be: body order", responseGetOrderByNumber.extract().body().path("order"));
     }
 
     @Test
     @DisplayName("Checking getting order by number without number order")
     public void cannotGetOrderWithoutNumberTest() {
-        Response responseGetOrderByNumber = orderClient.getOrderWithoutNumber();
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseGetOrderByNumber = orderClient.getOrderWithoutNumber()
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для поиска";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseGetOrderByNumber.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseGetOrderByNumber.then().extract().body().path("message"));
+                responseGetOrderByNumber.extract().body().path("message"));
      }
 
     @Test
     @DisplayName("Checking getting order by number with nonexistent number order")
     public void cannotGetOrderWithNonexistentNumberTest() {
-        Response responseGetOrderByNumber = orderClient.getOrderByNumber(Integer.parseInt(RandomStringUtils.randomNumeric(9)));
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseGetOrderByNumber = orderClient.getOrderByNumber(Integer.parseInt(RandomStringUtils.randomNumeric(9)))
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Заказ не найден";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseGetOrderByNumber.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseGetOrderByNumber.then().extract().body().path("message"));
+                responseGetOrderByNumber.extract().body().path("message"));
      }
 
     @After

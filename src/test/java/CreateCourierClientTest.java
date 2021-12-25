@@ -1,5 +1,5 @@
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,30 +24,30 @@ public class CreateCourierClientTest {
     public void canCreateCourierTest() {
         Courier courier = Courier.getAllVariables();
 
-        Response responseCreateCourier = courierClient.createCourier(courier);
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(courier)
+                .then().statusCode(SC_CREATED);
+        assertTrue("The response body should be: true", responseCreateCourier.extract().body().path("ok"));
 
-        int expectedCode = SC_CREATED;
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
-        assertTrue("The response body should be: true", responseCreateCourier.then().extract().body().path("ok"));
-
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
     }
 
     @Test
     @DisplayName("Checking create two identical couriers")
     public void cannotCreateTwoIdenticalCouriersTest() {
         Courier courier = Courier.getAllVariables();
-
         courierClient.createCourier(courier);
-        Response responseCreateCourier = courierClient.createCourier(courier);
 
-        int expectedCode = SC_CONFLICT;
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(courier)
+                .then().statusCode(SC_CONFLICT);
         String expectedMessage = "Этот логин уже используется";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseCreateCourier.then().extract().body().path("message"));
+                responseCreateCourier.extract().body().path("message"));
 
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
     }
 
     @Test
@@ -55,13 +55,11 @@ public class CreateCourierClientTest {
     public void cannotCreateCourierWithoutLoginTest() {
         Courier courier = Courier.getPasswordAndName();
 
-        Response responseCreateCourier = courierClient.createCourier(courier);
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(courier)
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для создания учетной записи";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage,expectedMessage,
-                responseCreateCourier.then().extract().body().path("message"));
+                responseCreateCourier.extract().body().path("message"));
     }
 
     @Test
@@ -69,13 +67,11 @@ public class CreateCourierClientTest {
     public void cannotCreateCourierWithoutPasswordTest() {
         Courier courier = Courier.getLoginAndName();
 
-        Response responseCreateCourier = courierClient.createCourier(courier);
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(courier)
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для создания учетной записи";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage,expectedMessage,
-                responseCreateCourier.then().extract().body().path("message"));
+                responseCreateCourier.extract().body().path("message"));
     }
 
     @Test
@@ -83,30 +79,28 @@ public class CreateCourierClientTest {
     public void cannotCreateCourierWithoutFirstNameTest() {
         Courier courier = Courier.getLoginAndPassword();
 
-        Response responseCreateCourier = courierClient.createCourier(courier);
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(courier)
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для создания учетной записи";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseCreateCourier.then().extract().body().path("message"));
+                responseCreateCourier.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking create courier with busy login")
     public void cannotCreateCourierWithBusyLoginTest() {
         Courier courier = Courier.getAllVariables();
-
         courierClient.createCourier(courier);
-        Response responseCreateCourier = courierClient.createCourier(Courier.getNewPasswordAndName(courier.login));
 
-        int expectedCode = SC_CONFLICT;
+        ValidatableResponse responseCreateCourier = courierClient.createCourier(Courier.getNewPasswordAndName(courier.login))
+                .then().statusCode(SC_CONFLICT);
         String expectedMessage = "Этот логин уже используется";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseCreateCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseCreateCourier.then().extract().body().path("message"));
+                responseCreateCourier.extract().body().path("message"));
 
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
     }
 
     @After

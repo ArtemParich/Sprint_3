@@ -1,5 +1,5 @@
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,77 +18,67 @@ public class LoginCourierClientTest {
         courierClient = new CourierClient();
         courier = Courier.getAllVariables();
         courierClient.createCourier(courier);
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
     }
 
     @Test
     @DisplayName("Checking login courier")
     public void canLoginCourierTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier));
-
-        int expectedCode = SC_OK;
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK);
         assertNotNull("The response body should be: id courier", Integer.toString(courierId));
     }
 
     @Test
     @DisplayName("Checking login courier without login")
     public void cannotLoginCourierWithoutLoginTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordWithoutLogin(courier));
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordWithoutLogin(courier))
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для входа";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                    responseLoginCourier.then().extract().body().path("message"));
+                    responseLoginCourier.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking login courier without password")
     public void cannotLoginCourierWithoutPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginWithoutPassword(courier));
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginWithoutPassword(courier))
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для входа";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseLoginCourier.then().extract().body().path("message"));
+                responseLoginCourier.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking login courier with incorrect login")
     public void cannotLoginCourierIncorrectLoginTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordAndIncorrectLogin(courier));
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordAndIncorrectLogin(courier))
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Учетная запись не найдена";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseLoginCourier.then().extract().body().path("message"));
+                responseLoginCourier.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking login courier with incorrect password")
     public void cannotLoginCourierIncorrectPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginAndIncorrectPassword(courier));
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginAndIncorrectPassword(courier))
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Учетная запись не найдена";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseLoginCourier.then().extract().body().path("message"));
+                responseLoginCourier.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking login courier with incorrect user")
     public void cannotLoginCourierIncorrectLoginAndPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getIncorrectLoginAndPassword(courier));
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseLoginCourier = courierClient.loginCourier(CourierCredentials.getIncorrectLoginAndPassword(courier))
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Учетная запись не найдена";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseLoginCourier.then().extract().body().path("message"));
+                responseLoginCourier.extract().body().path("message"));
     }
 
     @After

@@ -1,15 +1,13 @@
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 
 public class OrderClient extends RestAssuredParameters{
 
     @Override
     public String toString() {
-        return "Order{}";
+        return "OrderClient{}";
     }
 
     public static final String URL_ORDER = "/orders";
@@ -32,11 +30,11 @@ public class OrderClient extends RestAssuredParameters{
     }
 
     @Step("Sending GET request to " + URL_ORDER_TRACK + " for get courier id")
-    public int getOrderId(int trackOrder) {
+    public Response getOrderId(int trackOrder) {
         return given()
                 .spec(getBaseParameters())
                 .queryParam("t", trackOrder)
-                .get(URL_ORDER_TRACK).then().extract().body().path("order.id");
+                .get(URL_ORDER_TRACK);
     }
 
     @Step("Sending GET request to " + URL_ORDER_TRACK)
@@ -77,10 +75,5 @@ public class OrderClient extends RestAssuredParameters{
                 .spec(getBaseParameters())
                 .queryParam("courierId", courierId)
                 .put(URL_ORDER_ACCEPT);
-    }
-
-    @Step ("Getting order track")
-    public int getOrderTrack(OrderClient orderClient, List<String> color) {
-        return orderClient.createOrder(Order.getVariablesParamOrder(color)).then().extract().body().path("track");
     }
 }

@@ -1,5 +1,5 @@
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -26,59 +26,56 @@ public class AcceptOderTest {
         courierClient = new CourierClient();
         courier = Courier.getAllVariables();
         courierClient.createCourier(courier);
-        courierId = courierClient.getCourierId(courierClient, courier);
+        courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
         orderClient = new OrderClient();
-        orderTrack = orderClient.getOrderTrack(orderClient, color);
-        orderId = orderClient.getOrderId(orderTrack);
+        orderTrack = orderClient.createOrder(Order.getVariablesParamOrder(color))
+                .then().statusCode(SC_CREATED)
+                .extract().body().path("track");
+        orderId = orderClient.getOrderId(orderTrack)
+                .then().statusCode(SC_OK)
+                .extract().body().path("order.id");
     }
 
     @Test
     @DisplayName("Checking accept order")
     public void canAcceptOrderTest() {
-        Response responseAcceptOrder = orderClient.acceptOrder(courierId, orderId);
-
-        int expectedCode = SC_OK;
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
-        assertTrue("The response body should be: ", responseAcceptOrder.then().extract().body().path("ok"));
+        ValidatableResponse responseAcceptOrder = orderClient.acceptOrder(courierId, orderId)
+                .then().statusCode(SC_OK);
+        assertTrue("The response body should be: ", responseAcceptOrder.extract().body().path("ok"));
     }
 
     @Test
     @DisplayName("Checking accept order without courier id")
     public void cannotAcceptOrderWithoutCourierIdTest() {
-        Response responseAcceptOrder = orderClient.acceptOrderWithoutCourierId(orderId);
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseAcceptOrder = orderClient.acceptOrderWithoutCourierId(orderId)
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для поиска";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseAcceptOrder.then().extract().body().path("message"));
+                responseAcceptOrder.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking accept order without order id")
     public void cannotAcceptOrderWithoutOrderIdTest() {
-        Response responseAcceptOrder = orderClient.acceptOrderWithoutOrderId(courierId);
-
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseAcceptOrder = orderClient.acceptOrderWithoutOrderId(courierId)
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для поиска";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseAcceptOrder.then().extract().body().path("message"));
+                responseAcceptOrder.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking accept order with nonexistent courier id")
     public void cannotAcceptOrderWithNonexistentCourierIdTest() {
         int randomCourierId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
-        int orderId = orderClient.getOrderId(orderTrack);
 
-        Response responseAcceptOrder = orderClient.acceptOrder(randomCourierId, orderId);
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseAcceptOrder = orderClient.acceptOrder(randomCourierId, orderId)
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Курьера с таким id не существует";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseAcceptOrder.then().extract().body().path("message"));
+                responseAcceptOrder.extract().body().path("message"));
     }
 
     @Test
@@ -86,13 +83,11 @@ public class AcceptOderTest {
     public void cannotAcceptOrderWithNonexistentOrderIdTest() {
         int randomOrderId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
 
-        Response responseAcceptOrder = orderClient.acceptOrder(courierId, randomOrderId);
-
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseAcceptOrder = orderClient.acceptOrder(courierId, randomOrderId)
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Заказа с таким id не существует";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseAcceptOrder.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseAcceptOrder.then().extract().body().path("message"));
+                responseAcceptOrder.extract().body().path("message"));
     }
 
     @After

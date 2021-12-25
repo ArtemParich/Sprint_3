@@ -7,7 +7,7 @@ public class CourierClient extends RestAssuredParameters {
 
     @Override
     public String toString() {
-        return "Courier{}";
+        return "CourierClient{}";
     }
 
     public static final String COURIER_URL = "/courier/";
@@ -44,10 +44,5 @@ public class CourierClient extends RestAssuredParameters {
         return given()
                 .spec(getBaseParameters())
                 .delete(COURIER_URL);
-    }
-
-    @Step ("Getting courier id")
-    public int getCourierId(CourierClient courierClient, Courier courier) {
-        return courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier)).then().extract().body().path("id");
     }
 }

@@ -7,7 +7,7 @@ public class Courier {
 
     @Override
     public String toString() {
-        return "VariablesCreate{" +
+        return "Courier{" +
                 "login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +

@@ -1,5 +1,5 @@
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,37 +23,36 @@ public class DeleteCourierClientTest {
         courierClient = new CourierClient();
         Courier courier = Courier.getAllVariables();
         courierClient.createCourier(courier);
-        int courierId = courierClient.getCourierId(courierClient, courier);
-        Response responseDeleteCourier = courierClient.deleteCourier(courierId);
+        int courierId = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier))
+                .then().statusCode(SC_OK)
+                .extract().body().path("id");
 
-        int expectedCode = SC_OK;
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseDeleteCourier.statusCode());
-        assertTrue("The response body should be: true", responseDeleteCourier.then().extract().body().path("ok"));
+        ValidatableResponse responseDeleteCourier = courierClient.deleteCourier(courierId)
+                .then().statusCode(SC_OK);
+        assertTrue("The response body should be: true", responseDeleteCourier.extract().body().path("ok"));
     }
 
     @Test
     @DisplayName("Checking delete courier without courier id")
     public void cannotDeleteCourierWithoutIdTest() {
         courierClient = new CourierClient();
-        Response responseDeleteCourierWithoutId = courierClient.deleteCourierWithoutCourierId();
 
-        int expectedCode = SC_BAD_REQUEST;
+        ValidatableResponse responseDeleteCourierWithoutId = courierClient.deleteCourierWithoutCourierId()
+                .then().statusCode(SC_BAD_REQUEST);
         String expectedMessage = "Недостаточно данных для удаления курьера";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseDeleteCourierWithoutId.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseDeleteCourierWithoutId.then().extract().body().path("message"));
+                responseDeleteCourierWithoutId.extract().body().path("message"));
     }
 
     @Test
     @DisplayName("Checking delete courier with nonexistent courier id")
     public void cannotDeleteCourierWithNonexistentIdTest() {
         int courierId = Integer.parseInt(RandomStringUtils.randomNumeric(9));
-        Response responseDeleteCourierWithoutId = courierClient.deleteCourier(courierId);
 
-        int expectedCode = SC_NOT_FOUND;
+        ValidatableResponse responseDeleteCourierWithoutId = courierClient.deleteCourier(courierId)
+                .then().statusCode(SC_NOT_FOUND);
         String expectedMessage = "Курьера с таким id нет";
-        assertEquals("The code should be: " + expectedCode, expectedCode, responseDeleteCourierWithoutId.statusCode());
         assertEquals("The response body should be: " + expectedMessage, expectedMessage,
-                responseDeleteCourierWithoutId.then().extract().body().path("message"));
+                responseDeleteCourierWithoutId.extract().body().path("message"));
     }
 }

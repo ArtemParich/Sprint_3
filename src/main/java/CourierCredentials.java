@@ -6,7 +6,7 @@ public class CourierCredentials {
 
     @Override
     public String toString() {
-        return "VariablesLogin{" +
+        return "CourierCredentials{" +
                 "login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 '}';
