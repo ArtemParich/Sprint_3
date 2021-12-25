@@ -24,7 +24,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier")
     public void canLoginCourierTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLogin(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier));
 
         int expectedCode = SC_OK;
         assertEquals("The code should be: " + expectedCode, expectedCode, responseLoginCourier.statusCode());
@@ -34,7 +34,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier without login")
     public void cannotLoginCourierWithoutLoginTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginWithoutLog(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordWithoutLogin(courier));
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для входа";
@@ -46,7 +46,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier without password")
     public void cannotLoginCourierWithoutPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginWithoutPas(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginWithoutPassword(courier));
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для входа";
@@ -58,7 +58,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier with incorrect login")
     public void cannotLoginCourierIncorrectLoginTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectLog(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getPasswordAndIncorrectLogin(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";
@@ -70,7 +70,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier with incorrect password")
     public void cannotLoginCourierIncorrectPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectPas(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getLoginAndIncorrectPassword(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";
@@ -82,7 +82,7 @@ public class LoginCourierClientTest {
     @Test
     @DisplayName("Checking login courier with incorrect user")
     public void cannotLoginCourierIncorrectLoginAndPasswordTest() {
-        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getVariableLoginIncorrectLogAndPas(courier));
+        Response responseLoginCourier = courierClient.loginCourier(CourierCredentials.getIncorrectLoginAndPassword(courier));
 
         int expectedCode = SC_NOT_FOUND;
         String expectedMessage = "Учетная запись не найдена";

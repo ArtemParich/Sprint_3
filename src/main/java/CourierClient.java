@@ -39,7 +39,7 @@ public class CourierClient extends RestAssuredParameters {
     }
 
     @Step ("Sending DELETE request to " + COURIER_URL + " without courier id")
-    public Response deleteCourierWithoutId() {
+    public Response deleteCourierWithoutCourierId() {
 
         return given()
                 .spec(getBaseParameters())
@@ -48,6 +48,6 @@ public class CourierClient extends RestAssuredParameters {
 
     @Step ("Getting courier id")
     public int getCourierId(CourierClient courierClient, Courier courier) {
-        return courierClient.loginCourier(CourierCredentials.getVariableLogin(courier)).then().extract().body().path("id");
+        return courierClient.loginCourier(CourierCredentials.getVariablesForAuthorization(courier)).then().extract().body().path("id");
     }
 }

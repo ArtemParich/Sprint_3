@@ -35,7 +35,7 @@ public class DeleteCourierClientTest {
     @DisplayName("Checking delete courier without courier id")
     public void cannotDeleteCourierWithoutIdTest() {
         courierClient = new CourierClient();
-        Response responseDeleteCourierWithoutId = courierClient.deleteCourierWithoutId();
+        Response responseDeleteCourierWithoutId = courierClient.deleteCourierWithoutCourierId();
 
         int expectedCode = SC_BAD_REQUEST;
         String expectedMessage = "Недостаточно данных для удаления курьера";
